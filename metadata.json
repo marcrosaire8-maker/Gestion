@@ -1,0 +1,6 @@
+{
+  "name": "Gestion Financière et Inventaire",
+  "description": "Application web de gestion d'inventaire et comptabilité avec authentification Supabase.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
