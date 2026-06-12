@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { DbService } from '../services/dbService';
 import { UserProfile } from '../types';
-import { Lock, Mail, AlertCircle, ShieldCheck, UserCheck, HelpCircle } from 'lucide-react';
-import { motion } from 'motion/react';
+import { Lock, Mail, AlertCircle, ShieldCheck, ArrowRight, Loader2 } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface LoginProps {
   onLoginSuccess: (user: UserProfile) => void;
@@ -13,7 +13,7 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [showHelp, setShowHelp] = useState(false);
+  const [showHelp, setShowHelp] = useState(false); // Kept state as per original code
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -43,109 +43,159 @@ export default function Login({ onLoginSuccess }: LoginProps) {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-950 text-slate-100 p-4 relative overflow-hidden select-none">
-      {/* Background radial glow */}
-      <div className="absolute top-1/4 left-1/4 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-900/20 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute bottom-1/4 right-1/4 translate-x-1/2 translate-y-1/2 w-96 h-96 bg-emerald-950/20 rounded-full blur-3xl pointer-events-none" />
+    <div className="min-h-screen flex items-center justify-center bg-[#020617] text-slate-100 p-6 relative overflow-hidden select-none font-sans">
+      {/* Dynamic Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <motion.div 
+          animate={{ 
+            scale: [1, 1.2, 1],
+            opacity: [0.15, 0.25, 0.15],
+            x: [0, 50, 0],
+            y: [0, -30, 0]
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: "linear" }}
+          className="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] bg-indigo-600/30 rounded-full blur-[120px]" 
+        />
+        <motion.div 
+          animate={{ 
+            scale: [1, 1.3, 1],
+            opacity: [0.1, 0.2, 0.1],
+            x: [0, -40, 0],
+            y: [0, 60, 0]
+          }}
+          transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
+          className="absolute -bottom-[10%] -right-[10%] w-[50%] h-[50%] bg-emerald-500/20 rounded-full blur-[120px]" 
+        />
+      </div>
 
       <motion.div
-        initial={{ opacity: 0, y: 15 }}
+        initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="w-full max-w-md bg-slate-900/80 backdrop-blur-md border border-slate-800 rounded-2xl shadow-2xl p-8 relative z-10"
-        id="login-card"
+        transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        className="w-full max-w-[440px] relative z-10"
       >
-        {/* Banner Logo */}
-        <div className="flex flex-col items-center mb-8 text-center">
-          <div className="w-12 h-12 bg-indigo-600 rounded-xl flex items-center justify-center mb-3 shadow-lg shadow-indigo-600/30">
-            <ShieldCheck className="w-6 h-6 text-white" />
+        {/* Main Card */}
+        <div className="bg-slate-900/40 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.5)] overflow-hidden">
+          
+          {/* Accent Line */}
+          <div className="h-1.5 w-full bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-500" />
+          
+          <div className="p-10">
+            {/* Header */}
+            <div className="flex flex-col items-center mb-10 text-center">
+              <motion.div 
+                whileHover={{ scale: 1.05 }}
+                className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-2xl flex items-center justify-center mb-5 shadow-xl shadow-indigo-500/20 ring-1 ring-white/20"
+              >
+                <ShieldCheck className="w-7 h-7 text-white" strokeWidth={1.5} />
+              </motion.div>
+              <h1 className="text-3xl font-bold tracking-tight text-white mb-2">
+                Bienvenue
+              </h1>
+              <p className="text-slate-400 text-sm font-medium">
+                Accédez à votre console de gestion financière
+              </p>
+            </div>
+
+            {/* Error Message */}
+            <AnimatePresence mode="wait">
+              {error && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0, mb: 0 }}
+                  animate={{ opacity: 1, height: 'auto', mb: 24 }}
+                  exit={{ opacity: 0, height: 0, mb: 0 }}
+                  className="overflow-hidden"
+                >
+                  <div className="p-4 bg-rose-500/10 border border-rose-500/20 rounded-2xl flex items-start gap-3">
+                    <AlertCircle className="w-5 h-5 shrink-0 text-rose-500" />
+                    <div>
+                      <h4 className="text-sm font-bold text-rose-200">Erreur de connexion</h4>
+                      <p className="text-xs text-rose-300/80 mt-0.5 leading-relaxed">{error}</p>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-[0.1em] ml-1">
+                  Identifiant Email
+                </label>
+                <div className="group relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500 transition-colors group-focus-within:text-indigo-400">
+                    <Mail className="w-[18px] h-[18px]" />
+                  </span>
+                  <input
+                    id="email-input"
+                    type="email"
+                    required
+                    className="w-full pl-11 pr-4 py-3.5 bg-slate-950/40 border border-slate-700/50 rounded-2xl text-sm focus:outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all text-white placeholder-slate-600 shadow-inner"
+                    placeholder="nom@entreprise.bj"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-[0.1em] ml-1">
+                  Mot de passe
+                </label>
+                <div className="group relative">
+                  <span className="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-500 transition-colors group-focus-within:text-indigo-400">
+                    <Lock className="w-[18px] h-[18px]" />
+                  </span>
+                  <input
+                    id="password-input"
+                    type="password"
+                    required
+                    className="w-full pl-11 pr-4 py-3.5 bg-slate-950/40 border border-slate-700/50 rounded-2xl text-sm focus:outline-none focus:border-indigo-500/50 focus:ring-4 focus:ring-indigo-500/10 transition-all text-white placeholder-•••••••• shadow-inner"
+                    placeholder="Entrez votre code secret"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              <button
+                id="btn-submit-login"
+                type="submit"
+                disabled={loading}
+                className="relative overflow-hidden w-full py-4 bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white rounded-2xl font-bold text-sm transition-all flex items-center justify-center gap-2 shadow-xl shadow-indigo-600/25 disabled:opacity-70 disabled:cursor-not-allowed group"
+              >
+                {loading ? (
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                ) : (
+                  <>
+                    <span className="relative z-10">Se connecter au tableau de bord</span>
+                    <ArrowRight className="w-4 h-4 relative z-10 group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
+                {/* Glossy overlay effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:animate-[shimmer_1.5s_infinite] pointer-events-none" />
+              </button>
+            </form>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-white font-sans">
-            Gestion Financière & Inventaire
-          </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Portail de gestion des flux de trésorerie de votre entreprise
-          </p>
         </div>
 
-        {error && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            className="mb-6 p-4 bg-rose-500/10 border border-rose-500/30 rounded-xl flex items-start gap-3 text-rose-200 text-sm"
-            id="login-error"
-          >
-            <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-rose-400" />
-            <div>
-              <p className="font-semibold">Erreur d'authentification</p>
-              <p className="text-xs text-rose-300/80 mt-0.5">{error}</p>
-            </div>
-          </motion.div>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <div>
-            <label className="block text-xs font-medium text-slate-300 uppercase tracking-wider mb-2">
-              Adresse Email (Supabase Auth)
-            </label>
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
-                <Mail className="w-4 h-4" />
-              </span>
-              <input
-                id="email-input"
-                type="email"
-                required
-                className="w-full pl-10 pr-4 py-3 bg-slate-950/50 border border-slate-800 rounded-xl text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-white placeholder-slate-500"
-                placeholder="Ex: admin@gestion.bj"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <div>
-            <div className="flex justify-between items-center mb-2">
-              <label className="block text-xs font-medium text-slate-300 uppercase tracking-wider">
-                Mot de Passe
-              </label>
-            </div>
-            <div className="relative">
-              <span className="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
-                <Lock className="w-4 h-4" />
-              </span>
-              <input
-                id="password-input"
-                type="password"
-                required
-                className="w-full pl-10 pr-4 py-3 bg-slate-950/50 border border-slate-800 rounded-xl text-sm focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all text-white placeholder-••••••••"
-                placeholder="Votre mot de passe secret"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-          </div>
-
-          <button
-            id="btn-submit-login"
-            type="submit"
-            disabled={loading}
-            className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white rounded-xl font-medium text-sm transition-all flex items-center justify-center gap-2 shadow-lg shadow-indigo-600/20 disabled:opacity-50 disabled:cursor-not-allowed group cursor-pointer"
-          >
-            {loading ? (
-              <svg className="animate-spin h-5 w-5 text-white" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
-              </svg>
-            ) : (
-              <>
-                Se connecter
-                <motion.span className="group-hover:translate-x-1 transition-transform">➔</motion.span>
-              </>
-            )}
-          </button>
-        </form>
+        {/* Footer / Meta info */}
+        <motion.p 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+          className="text-center mt-8 text-slate-500 text-xs font-medium tracking-wide uppercase"
+        >
+          Système Sécurisé &bull; Version 2.4.0
+        </motion.p>
       </motion.div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @keyframes shimmer {
+          100% { transform: translateX(100%); }
+        }
+      `}} />
     </div>
   );
 }
